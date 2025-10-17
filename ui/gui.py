@@ -13,7 +13,7 @@ def resource_path(relative_path):
 def run_gui():
     root = tk.Tk()
     root.title("NPC & Monster XML Generator")
-    root.geometry("540x300")
+    root.geometry("540x360")
     root.configure(bg="#121212")
     root.resizable(False, False)
     root.eval('tk::PlaceWindow . center')
@@ -42,19 +42,35 @@ def run_gui():
     # Header
     ttk.Label(root, text="🧩 NPC & Monster XML Generator", style="Title.TLabel").pack(pady=15)
 
-    # Folder selection
-    frame = ttk.Frame(root)
-    frame.pack(pady=5)
+    # Input folder selection
+    frame_input = ttk.Frame(root)
+    frame_input.pack(pady=5, padx=20, fill=tk.X)
     path_var = tk.StringVar()
-    entry = ttk.Entry(frame, textvariable=path_var, width=50)
-    entry.pack(side=tk.LEFT, padx=5)
+    entry = ttk.Entry(frame_input, textvariable=path_var)
+    entry.pack(side=tk.LEFT, fill=tk.X, expand=True)
 
-    def select_folder():
+    def select_input_folder():
         folder = filedialog.askdirectory(title="Select folder with Lua files")
         if folder:
             path_var.set(folder)
 
-    ttk.Button(frame, text="📂 Browse", style="Primary.TButton", command=select_folder).pack(side=tk.LEFT)
+    btn_input = ttk.Button(frame_input, text="📂 Browse Input", style="Primary.TButton", command=select_input_folder)
+    btn_input.pack(side=tk.LEFT, padx=(5,0))
+
+    # Output folder selection
+    frame_output = ttk.Frame(root)
+    frame_output.pack(pady=5, padx=20, fill=tk.X)
+    output_var = tk.StringVar()
+    entry_output = ttk.Entry(frame_output, textvariable=output_var)
+    entry_output.pack(side=tk.LEFT, fill=tk.X, expand=True)
+
+    def select_output_folder():
+        folder = filedialog.askdirectory(title="Select output folder")
+        if folder:
+            output_var.set(folder)
+
+    btn_output = ttk.Button(frame_output, text="📂 Browse Output", style="Primary.TButton", command=select_output_folder)
+    btn_output.pack(side=tk.LEFT, padx=(5,0))
 
     # Progress bar
     progress = ttk.Progressbar(root, length=320)
@@ -90,11 +106,11 @@ def run_gui():
         # Detect type automatically
         type_ = processor.detect_type(folder)
 
-        # Project root directory
-        project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-
-        # Create output folder if it doesn't exist
-        output_dir = os.path.join(project_root, "output")
+        # Use chosen output folder or default to project output
+        output_dir = output_var.get().strip()
+        if not output_dir:
+            project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+            output_dir = os.path.join(project_root, "output")
         os.makedirs(output_dir, exist_ok=True)
 
         # Full path for the XML file
