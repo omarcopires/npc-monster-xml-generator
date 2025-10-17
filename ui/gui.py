@@ -8,7 +8,7 @@ def run_gui():
     # Create main window
     root = tk.Tk()
     root.title("NPC & Monster XML Generator")
-    root.geometry("540x300")
+    root.geometry("540x350")
     root.configure(bg="#121212")
     root.resizable(False, False)
     root.eval('tk::PlaceWindow . center')
@@ -17,7 +17,6 @@ def run_gui():
     style = ttk.Style()
     style.theme_use("clam")
 
-    # Colors
     PRIMARY = "#0d6efd"
     PRIMARY_HOVER = "#0b5ed7"
     BG = "#121212"
@@ -48,6 +47,13 @@ def run_gui():
             path_var.set(folder)
 
     ttk.Button(frame, text="📂 Browse", style="Primary.TButton", command=select_folder).pack(side=tk.LEFT)
+
+    # Type selection (NPC or Monster)
+    type_var = tk.StringVar(value="npc")
+    frame_type = ttk.Frame(root)
+    frame_type.pack(pady=5)
+    ttk.Radiobutton(frame_type, text="NPCs", variable=type_var, value="npc").pack(side=tk.LEFT, padx=10)
+    ttk.Radiobutton(frame_type, text="Monsters", variable=type_var, value="monster").pack(side=tk.LEFT, padx=10)
 
     # Progress bar
     progress = ttk.Progressbar(root, length=320)
@@ -80,6 +86,8 @@ def run_gui():
             messagebox.showerror("Error", "Please select a valid folder containing Lua files.")
             return
 
+        type_ = type_var.get()
+
         # Project root directory
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 
@@ -88,7 +96,7 @@ def run_gui():
         os.makedirs(output_dir, exist_ok=True)
 
         # Full path for the XML file
-        output_file = os.path.join(output_dir, "npcs.xml")
+        output_file = os.path.join(output_dir, f"{type_}.xml")
 
         # Disable button and reset progress
         btn_generate.config(state='disabled')
@@ -105,11 +113,11 @@ def run_gui():
         # Generate XML
         def generate():
             try:
-                success, skipped = processor.process_lua_files(folder, output_file, update_progress)
+                success, skipped = processor.process_files(folder, output_file, update_progress, type_=type_)
                 status_var.set("Completed!")
                 messagebox.showinfo(
                     "Success",
-                    f"✅ NPCs processed: {success}\n🚫 Files skipped: {skipped}\n\n📄 XML saved at:\n{output_file}"
+                    f"✅ {type_.capitalize()} processed: {success}\n🚫 Files skipped: {skipped}\n\n📄 XML saved at:\n{output_file}"
                 )
             except Exception as e:
                 messagebox.showerror("Error", str(e))
@@ -119,7 +127,7 @@ def run_gui():
 
         root.after(100, generate)
 
-    # Create generate button after root is defined
+    # Create generate button
     btn_generate = ttk.Button(root, text="🚀 Generate XML", style="Primary.TButton", command=run)
     btn_generate.pack(pady=15)
 
