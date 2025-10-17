@@ -1,20 +1,25 @@
 import os
+import sys
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
-from tkinter import PhotoImage
 import webbrowser
 from core import processor
 
+def resource_path(relative_path):
+    if hasattr(sys, "_MEIPASS"):
+        return os.path.join(sys._MEIPASS, relative_path)
+    return os.path.join(os.path.abspath("."), relative_path)
+
 def run_gui():
-    # Create main window
     root = tk.Tk()
     root.title("NPC & Monster XML Generator")
     root.geometry("540x300")
     root.configure(bg="#121212")
     root.resizable(False, False)
     root.eval('tk::PlaceWindow . center')
-    icon = PhotoImage(file="icon.png")
-    root.iconphoto(True, icon)
+
+    icon_path = resource_path("favicon.ico")
+    root.iconbitmap(icon_path)
 
     # Styles
     style = ttk.Style()
