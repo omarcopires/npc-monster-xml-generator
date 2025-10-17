@@ -47,3 +47,21 @@ def process_files(folder: str, output_file: str, progress_callback, type_: str =
         monster_parser.generate_xml(data, output_file, skipped_files)
 
     return len(data), len(skipped_files)
+
+
+def detect_type(folder: str) -> str:
+    """
+    Detect whether the folder contains NPCs or Monsters.
+    Returns "npc" or "monster".
+    """
+    for root_dir, _, files in os.walk(folder):
+        for f in files:
+            if f.endswith(".lua"):
+                file_path = os.path.join(root_dir, f)
+                with open(file_path, "r", encoding="utf-8") as file:
+                    content = file.read()
+                    if "local internalNpcName" in content:
+                        return "npc"
+                    elif "local mType = Game.createMonsterType" in content:
+                        return "monster"
+    return "npc"  # default fallback

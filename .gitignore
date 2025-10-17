@@ -37,5 +37,4 @@ Thumbs.db
 *.sublime-workspace
 
 # XML output (optional: you can include or exclude)
-npcs.xml
-monster.xml
+output/*

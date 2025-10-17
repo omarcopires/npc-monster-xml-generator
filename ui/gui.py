@@ -1,6 +1,7 @@
 import os
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
+from tkinter import PhotoImage
 import webbrowser
 from core import processor
 
@@ -8,10 +9,12 @@ def run_gui():
     # Create main window
     root = tk.Tk()
     root.title("NPC & Monster XML Generator")
-    root.geometry("540x350")
+    root.geometry("540x300")
     root.configure(bg="#121212")
     root.resizable(False, False)
     root.eval('tk::PlaceWindow . center')
+    icon = PhotoImage(file="icon.png")
+    root.iconphoto(True, icon)
 
     # Styles
     style = ttk.Style()
@@ -42,18 +45,11 @@ def run_gui():
     entry.pack(side=tk.LEFT, padx=5)
 
     def select_folder():
-        folder = filedialog.askdirectory(title="Select NPC or Monster folder")
+        folder = filedialog.askdirectory(title="Select folder with Lua files")
         if folder:
             path_var.set(folder)
 
     ttk.Button(frame, text="📂 Browse", style="Primary.TButton", command=select_folder).pack(side=tk.LEFT)
-
-    # Type selection (NPC or Monster)
-    type_var = tk.StringVar(value="npc")
-    frame_type = ttk.Frame(root)
-    frame_type.pack(pady=5)
-    ttk.Radiobutton(frame_type, text="NPCs", variable=type_var, value="npc").pack(side=tk.LEFT, padx=10)
-    ttk.Radiobutton(frame_type, text="Monsters", variable=type_var, value="monster").pack(side=tk.LEFT, padx=10)
 
     # Progress bar
     progress = ttk.Progressbar(root, length=320)
@@ -70,7 +66,7 @@ def run_gui():
 
     footer = tk.Label(
         root,
-        text="© 2025 - Developed by Marco Pires",
+        text="© 2025 - Developed by @omarcopires",
         bg=BG,
         fg="#999",
         cursor="hand2",
@@ -86,7 +82,8 @@ def run_gui():
             messagebox.showerror("Error", "Please select a valid folder containing Lua files.")
             return
 
-        type_ = type_var.get()
+        # Detect type automatically
+        type_ = processor.detect_type(folder)
 
         # Project root directory
         project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
